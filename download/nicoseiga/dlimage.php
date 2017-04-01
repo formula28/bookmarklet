@@ -17,7 +17,7 @@ if (empty($download_file_name)) {
 }
 
 // 画像ソースページを取得.
-$nico_client = new NiconicoClient(, );
+$nico_client = new NiconicoClient($user_id, $pass_word);
 $image_source_html = $nico_client->get_image_source_page($illust_id);
 $image_source_html = mb_convert_encoding($image_source_html, 'HTML-ENTITIES', 'UTF-8');
 $image_source_dom = new DOMDocument();
