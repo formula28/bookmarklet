@@ -3,7 +3,9 @@ pixivのイラスト個別ページ閲覧中に実行すると、そのイラス
 */
 //(function(){
     /* ルートURI. */
-    var root_uri = "http://www.formula25.sakura.ne.jp";
+    var root_uri = "//formula25.sakura.ne.jp";
+    /* コンテンツダウンロード用プログラム. */
+    var dl_proxy_uri = "//formula25.sakura.ne.jp/bookmarklet/download/common/url_download.php";
 
     /* ライブラリのinclude. */
     ["jszip.min.js"].forEach(function(value) {
@@ -597,6 +599,10 @@ pixivのイラスト個別ページ閲覧中に実行すると、そのイラス
         console.log(ret);
         return ret;
     }
+    /* プロキシURL取得. */
+    function getProxyUrl(url, filename) {
+        return dl_proxy_uri+"?url="+url+"&dlname="+filename;
+    }
     /* URLからダウンロード用ファイル名取得. */
     function getDownloadFilename(url) {
         var org_fn = getFilenameWithoutExeInUrl(url);
@@ -644,36 +650,42 @@ pixivのイラスト個別ページ閲覧中に実行すると、そのイラス
     }
 
     /* 画像ダウンロード. */
+    var isDlProxy = true;
     function downloadIndivImage(url, filename) {
+        if (isDlProxy) {
+            downloadIndivImageProxy(url, filename);
+        } else {
+            downloadIndivImageAsync(url, filename);
+        }
+    }
+    function downloadIndivImageProxy(url, filename) {
+        saveFile(getProxyUrl(url, filename), filename);
+    }
+    function downloadIndivImageAsync(url, filename) {
+        console.log(url, filename);
         if (url != null && filename != null) {
             var xhr = new XMLHttpRequest();
             xhr.onload = function(e) {
                 console.log("非同期通信による画像ダウンロード成功.");
-                console.log(url, filename);
                 var blob_url = window.URL.createObjectURL(xhr.response);
-                saveFile(blob_url, filename);/*
-                var a = document.createElement("a");
-                a.href = blob_url;
-                a.download = filename;
-                a.target = "_blank";
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);*/
-                //window.URL.revokeObjectURL(blob_url);
+                saveFile(blob_url, filename);
             }
             xhr.onerror = function(e) {
+                console.log("readyState:" + xhr.readyState);
+                console.log("response:" + xhr.response);
+                console.log("status:" + xhr.status);
+                console.log("statusText:" + xhr.statusText);
                 console.log("非同期通信による画像ダウンロード失敗.");
-                console.log(url, filename);
-                saveFile(url, filename);/*
-                var a = document.createElement("a");
-                a.href = url;
-                a.download = filename;
-                a.target = "_blank";
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);*/
+                saveFile(url, filename);
             }
-            xhr.open("GET", url, true);
+            // xhr.open("GET", url, true);
+            var proxy_url = getProxyUrl(url, filename);
+            console.log(proxy_url);
+            xhr.open("GET", proxy_url, true);
+            // xhr.withCredentials = true;
+            // auth = btoa(user + ":" passwd);
+            // console.log(auth);
+            // xhr.setRequestHeader("Authorization", "Basic " + auth);
             xhr.responseType = "blob";
             xhr.send();
         }
@@ -682,43 +694,52 @@ pixivのイラスト個別ページ閲覧中に実行すると、そのイラス
     /* まとめて画像ダウンロード start. */
     var zip_blob_url = null;
     var zip;
+	/* スリープ付きループ処理.
+		aLoopLimit:ループ回数上限.
+		aInterval:スリープ時間[msec].
+		aMainFunc:ループ毎に実行する処理.
+	*/
+	function loopSleep(aLoopLimit, aInterval, aMainFunc){
+		var i = 0;
+		var loopFunc = function () {
+			var result = aMainFunc(i);
+			if (result === false
+				|| allDlstate != 1) {
+				return;
+			}
+			i = i + 1;
+			if (i < aLoopLimit) {
+				setTimeout(loopFunc, aInterval);
+			}
+		}
+		loopFunc();
+	}
     /* 全画像ダウンロード開始. */
     function downloadAllImage() {
         if (isParsedImageUrlDecision()) {
-            zip = new JSZip();
+            // zip = new JSZip();
             changeAllDlBtn(1, " 0/" + page_count);
-            zip_blob_url = null;
-            downloadImage(0);
-        }
-    }
-    /* count番目の画像ダウンロード開始. */
-    function downloadImage(count) {
-        var url = getDownloadImageUrl(count);
-        var filename = getDownloadFilename(url);
+            // zip_blob_url = null;
+            loopSleep(page_count, 500, function(count) {
+                var isSuccess = true;
+                try {
+                    var url = getDownloadImageUrl(count);
+                    var filename = getDownloadFilename(url);
+                    downloadIndivImage(url, filename);
+                    if (count+1 < page_count) {
+                        changeAllDlBtn(1, " " + (count+1) + "/" + page_count);
+                    } else {
+                        changeAllDlBtn(2, "");
+                    }
+                } catch (e) {
+                    isSuccess = false;
+                    changeAllDlBtn(3, "");
+                    console.log(e);
+                }
 
-        var xhr = new XMLHttpRequest();
-        // ダウンロード成功時処理.
-        xhr.onload = function(e) {
-            console.log("success. p_" + count);
-            zip.file(filename, xhr.response);
-            changeAllDlBtn(1, " " + (count+1) + "/" + page_count);
-            if (count+1 < page_count) {
-                // 続きをダウンロード.
-                downloadImage(count+1);
-            } else {
-                // 全てのファイルダウンロード完了.
-                var zipfile = zip.generate({ type: 'blob' });
-                zip_blob_url = window.URL.createObjectURL(zipfile);
-                changeAllDlBtn(2, "");
-            }
+                return isSuccess;
+            });
         }
-        xhr.onerror = function(e) {
-            console.log("fail.", url, filename);
-            changeAllDlBtn(3, "");
-        }
-        xhr.open("GET", url, true);
-        xhr.responseType = "arraybuffer";
-        xhr.send();
     }
     /* ファイル保存. */
     function saveFile(aUrl, aFilename) {
