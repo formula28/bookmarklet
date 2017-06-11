@@ -694,51 +694,40 @@ pixivのイラスト個別ページ閲覧中に実行すると、そのイラス
     /* まとめて画像ダウンロード start. */
     var zip_blob_url = null;
     var zip;
-	/* スリープ付きループ処理.
-		aLoopLimit:ループ回数上限.
-		aInterval:スリープ時間[msec].
-		aMainFunc:ループ毎に実行する処理.
-	*/
-	function loopSleep(aLoopLimit, aInterval, aMainFunc){
-		var i = 0;
-		var loopFunc = function () {
-			var result = aMainFunc(i);
-			if (result === false
-				|| allDlstate != 1) {
-				return;
-			}
-			i = i + 1;
-			if (i < aLoopLimit) {
-				setTimeout(loopFunc, aInterval);
-			}
-		}
-		loopFunc();
-	}
     /* 全画像ダウンロード開始. */
     function downloadAllImage() {
         if (isParsedImageUrlDecision()) {
-            // zip = new JSZip();
+            zip = new JSZip();
             changeAllDlBtn(1, " 0/" + page_count);
-            // zip_blob_url = null;
-            loopSleep(page_count, 500, function(count) {
-                var isSuccess = true;
-                try {
-                    var url = getDownloadImageUrl(count);
-                    var filename = getDownloadFilename(url);
-                    downloadIndivImage(url, filename);
-                    if (count+1 < page_count) {
-                        changeAllDlBtn(1, " " + (count+1) + "/" + page_count);
-                    } else {
-                        changeAllDlBtn(2, "");
-                    }
-                } catch (e) {
-                    isSuccess = false;
-                    changeAllDlBtn(3, "");
-                    console.log(e);
+            zip_blob_url = null;
+            downloadImage(0);
+        }
+    }
+    /* count番目の画像ダウンロード開始. */
+    function downloadImage(count) {
+        try {
+            var url = getDownloadImageUrl(count);
+            var filename = getDownloadFilename(url);
+            // 画像ダウンロード.
+            var img = document.createElement("img");
+            img.onload = function() {
+                // 読み込み完了時.
+                console.log("img.onload " + filename);
+                zip.file(filename, convertDataUrlToArrayBuffer(ImageToBase64(img, "image/png")));
+                if (count+1 < page_count) {
+                    changeAllDlBtn(1, " " + (count+1) + "/" + page_count);
+                    // 次の画像をダウンロード.
+                    downloadImage(count+1);
+                } else {
+                    // 最後までダウンロード完了.
+                    zip_blob_url = window.URL.createObjectURL(zip.generate({ type: 'blob' }));
+                    changeAllDlBtn(2, "");
                 }
-
-                return isSuccess;
-            });
+            }
+            img.src = getProxyUrl(url, filename);
+        } catch (e) {
+            changeAllDlBtn(3, "");
+            console.log(e);
         }
     }
     /* ファイル保存. */
@@ -755,6 +744,29 @@ pixivのイラスト個別ページ閲覧中に実行すると、そのイラス
             a.click();
             document.body.removeChild(a);
         }
+    }
+    /* <img>からBase64エンコード. */
+    function ImageToBase64(imgElem, mime_type) {
+        imgElem.crossOrigin = "Anonymous";
+        // New Canvas
+        var canvas = document.createElement('canvas');
+        canvas.width  = imgElem.width;
+        canvas.height = imgElem.height;
+        // Draw Image
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(imgElem, 0, 0);
+        // To Base64
+        // ※通常だと、toDataURLでエラーが起きる.セキュリティOFF起動したchromeで利用すること.
+        return canvas.toDataURL(mime_type);
+    }
+    /* DataURLからArrayBufferへ変換. */
+    function convertDataUrlToArrayBuffer(dataUrl) {
+        var bin = atob(dataUrl.replace(/^.*,/, ''));
+        var buffer = new Uint8Array(bin.length);
+        for (var i = 0; i < bin.length; i++) {
+            buffer[i] = bin.charCodeAt(i);
+        }
+        return buffer.buffer;
     }
     /* まとめて画像ダウンロード end. */
 
