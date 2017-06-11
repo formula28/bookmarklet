@@ -101,7 +101,7 @@
 
     /* 画像ダウンロード. */
     function downloadImage() {
-        php_base_url = "http://www.formula25.sakura.ne.jp/bookmarklet/download/nicoseiga/dlimage.php";
+        php_base_url = "//formula25.sakura.ne.jp/bookmarklet/download/nicoseiga/dlimage.php";
         illust_id = getIllustId();
         console.log(illust_id);
         if (illust_id != null) {
