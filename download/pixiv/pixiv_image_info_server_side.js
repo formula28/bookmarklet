@@ -623,6 +623,7 @@ pixivのイラスト個別ページ閲覧中に実行すると、そのイラス
         }
         ret += "." + org_exe;
         // ファイル名禁止文字を置換
+        ret = ret.replace(/&/g, '＆');
         ret = ret.replace(/:/g, '：');
         ret = ret.replace(/\//g, '／');
         ret = ret.replace(/\\/g, '￥');
