@@ -40,6 +40,7 @@ SonyのReaderStoreのブラウザ閲覧ページから画像を保存するbookm
         }
         ret += "." + org_exe;
         // ファイル名禁止文字を置換
+        ret = ret.replace(/&/g, '＆');
         ret = ret.replace(/:/g, '：');
         ret = ret.replace(/\//g, '／');
         ret = ret.replace(/\\/g, '￥');
