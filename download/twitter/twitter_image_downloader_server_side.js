@@ -102,6 +102,8 @@ twitterは、Content Security Policyによって外部scriptの追加が抑制�
         ret = ret.replace(/"/g, '”');
         ret = ret.replace(/</g, '＜');
         ret = ret.replace(/>/g, '＞');
+        // ファイル名に含まれていると、プロキシ側で正しくクエリパラメータとして認識されなくなるため、置換.
+        ret = ret.replace(/#/g, '＃');
         console.log(ret);
         return ret;
     }
