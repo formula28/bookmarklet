@@ -11,155 +11,26 @@ SonyのReaderStoreのブラウザ閲覧ページから画像を保存するbookm
 //(function(){
     /* ルートURI. */
     var root_uri = "http://www.formula25.sakura.ne.jp";
+    /* このスクリプトのルートURI. */
+    var script_root_uri = root_uri + "/bookmarklet/download/reader_store";
 
     /* ライブラリのinclude. */
-    ["jszip.min.sbd.js"].forEach(function(value) {
+    ["jszip.min.sbd.js"
+    , "mylib_util_dom.js"
+    , "mylib_util_str.js"
+    , "mylib_util_file.js"
+    , "mylib_util_logic.js"
+    ].forEach(function(value) {
         var script = document.createElement("script");
         script.src = root_uri + "/bookmarklet/common/library/" + value;
         document.body.appendChild(script);
     });
 
     /* ユーティリティ start. */
-    /* URLからダウンロード用ファイル名取得. */
-    function getDownloadFilename(url) {
-        var org_fn = getFilenameWithoutExeInUrl(url);
-        var org_exe = getExeInUrl(url);
-        var ret = "["
-            + user_name
-            + "]"
-            + image_title
-            + "_"
-            + org_fn;
-        if (tags != null && tags.length > 0) {
-            var tagtext = "[" + tags[0];
-            for(var i=1;i < tags.length;i++){
-                tagtext += ' ' + tags[i];
-            }
-            tagtext += "]";
-            ret += tagtext;
-        }
-        ret += "." + org_exe;
-        // ファイル名禁止文字を置換
-        ret = ret.replace(/&/g, '＆');
-        ret = ret.replace(/:/g, '：');
-        ret = ret.replace(/\//g, '／');
-        ret = ret.replace(/\\/g, '￥');
-        ret = ret.replace(/\|/g, '｜');
-        ret = ret.replace(/\*/g, '＊');
-        ret = ret.replace(/\?/g, '？');
-        ret = ret.replace(/"/g, '”');
-        ret = ret.replace(/</g, '＜');
-        ret = ret.replace(/>/g, '＞');
-        console.log(ret);
-        return ret;
-    }
-
-    /* URLからファイル名部分(拡張子付き)取得. */
-    function getFilenameInUrl(url) {
-        return url.match(".+/(.+?)([\?#;].*)?$")[1];
-    }
-    /* URLからファイル名部分(拡張子なし)取得. */
-    function getFilenameWithoutExeInUrl(url) {
-        return url.match(".+/(.+?)\.[a-z]+([\?#;].*)?$")[1];
-    }
-    /* URLから拡張子部分取得. */
-    function getExeInUrl(url) {
-        return url.match(".+/.+?\.([a-z]+)([\?#;].*)?$")[1];
-    }
-    /* 属性値設定処理(elem要素のattr属性にattrValueを設定する).
-    */
-    function changeAttr(elem,attr,attrValue) {
-        if (elem != null && attr != null) {
-            elem.setAttribute(attr,attrValue);
-        }
-    }
-    /* 属性値設定単体切替処理(elem要素のattr属性にattrValueが含まれれば削除、含まれなければ追加する). */
-    function toggleAttr(elem,attr,attrValue) {
-        if (elem != null && attr != null) {
-            var curAttrList = elem.getAttribute(attr).split(/\s+/);
-            var i = 0;
-            for (i=0;i<curAttrList.length;i++) {
-                if (curAttrList[i]==attrValue) {
-                    curAttrList[i] = "";
-                    break;
-                }
-            }
-            if (i >= curAttrList.length) {
-                curAttrList.push(" "+attrValue);
-            }
-            elem.setAttribute(attr,curAttrList.join(' ').split(/\s+/).join(' '));
-        }
-    }
     /* マウスオーバー状態切替. */
     function toggleMouseOverState(elem) {
         toggleAttr(elem,'class','normal');
         toggleAttr(elem,'class','over');
-    }
-    /* html elementをStringに変換. */
-    function getElementText(element) {
-        var ret = 'null';
-        if(element != null){
-            ret = element.textContent;
-        }
-        return ret;
-    }
-
-    /* DataURLからBlobURLへ変換. */
-    function convertDataUrlToBlobUrl(dataUrl) {
-        var bin = atob(dataUrl.replace(/^.*,/, ''));
-        var buffer = new Uint8Array(bin.length);
-        for (var i = 0; i < bin.length; i++) {
-            buffer[i] = bin.charCodeAt(i);
-        }
-        // Blobを作成
-        var blob = new Blob([buffer.buffer], {type: "image/png"});
-        return window.URL.createObjectURL(blob);
-    }
-    /* DataURLからArrayBufferへ変換. */
-    function convertDataUrlToArrayBuffer(dataUrl) {
-        var bin = atob(dataUrl.replace(/^.*,/, ''));
-        var buffer = new Uint8Array(bin.length);
-        for (var i = 0; i < bin.length; i++) {
-            buffer[i] = bin.charCodeAt(i);
-        }
-        return buffer.buffer;
-    }
-
-    /* ファイル保存. */
-    function saveFile(aUrl, aFilename) {
-        console.log(aFilename);
-        if (aUrl != null) {
-            var a = document.createElement("a");
-            a.href = aUrl;
-            if (aFilename != null) {
-                a.download = aFilename;
-            }
-            a.target = "_blank";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-    }
-    /* 非負整数値の10進数での桁数. */
-    function getDecimalNumberLength(aNum) {
-        var ret = 0;
-        if (aNum > 0) {
-            ret = Math.floor(Math.log(aNum) * Math.LOG10E) + 1;
-        } else if (aNum == 0) {
-            ret = 1;
-        }
-        return ret;
-    }
-    /* 非負整数値0詰め文字列. */
-    function getZeroFillString(aNum, aSize) {
-        var ret = "";
-        if (0 <= aNum && 0 < aSize) {
-            for (var i=0;i<aSize-getDecimalNumberLength(aNum);i++) {
-                ret += "0";
-            }
-        }
-        ret += String(aNum);
-        return ret;
     }
     /* ユーティリティ end. */
 
@@ -173,70 +44,17 @@ SonyのReaderStoreのブラウザ閲覧ページから画像を保存するbookm
     function appendHead() {
         appendStyle(document.head);
     }
-    /* <style>~</style>. */
+    /* スタイルシート. */
     function appendStyle(parent) {
-        var elem = parent.querySelector("style.sony_book_download");
+        var elem = parent.querySelector("link.sony_book_download");
         if (elem != null) {
             parent.removeChild(elem);
         }
-        var text = "";
-        // キャプチャボタン.
-        text += '#captureBtnArea {\n'
-        text += 'position:absolute;\n'
-        text += 'bottom:100px;\n'
-        text += '}\n';
-
-        text += '[class*="captureBtn"] {\n'
-        text += 'width:120px;\n'
-        text += 'height:40px;\n'
-        text += 'margin:3px;\n'
-        text += 'display: inline-block;\n';
-        text += 'text-align: center;\n';
-        text += 'vertical-align: middle;\n';
-        text += '}\n';
-
-        text += '[class*="captureBtn"][class*="normal"]\n';
-        text += '{\n';
-        text += 'border: solid #CCC;\n';
-        text += 'border-width:1px 3px 3px 1px;\n';
-        text += 'border-radius: 8px;\n';
-        text += '-ms-border-radius: 8px;\n';
-        text += '-moz-border-radius: 8px;\n';
-        text += '-webkit-border-radius: 8px;\n';
-        text += 'background: -ms-linear-gradient(top,#FFF 0%,#FFF 3%,#E6E6E6 3%,#FFF);\n';
-        text += 'background: -moz-linear-gradient(top,#FFF 0%,#FFF 3%,#E6E6E6 3%,#FFF);\n';
-        text += 'background: -webkit-gradient(linear, left top, left bottom, from(#FFF), color-stop(0.03,#FFF), color-stop(0.03,#E6E6E6), to(#FFF));\n';
-        text += 'color: #111;\n';
-        text += '}\n';
-
-        text += '[class*="captureBtn"][class*="over"] \n';
-        text += '{\n';
-        text += 'border: solid #0099CC;\n';
-        text += 'border-width:1px 3px 3px 1px;\n';
-        text += 'border-radius: 8px;\n';
-        text += '-ms-border-radius: 8px;\n';
-        text += '-moz-border-radius: 8px;\n';
-        text += '-webkit-border-radius: 8px;\n';
-        text += 'background: -ms-linear-gradient(top,#B1D2E0 0%,#B1D2E0 3%,#0099CC 3%,#069);\n';
-        text += 'background: -moz-linear-gradient(top,#B1D2E0 0%,#B1D2E0 3%,#0099CC 3%,#069);\n';
-        text += 'background: -webkit-gradient(linear, left top, left bottom, from(#B1D2E0), color-stop(0.03,#B1D2E0), color-stop(0.03,#0099CC), to(#069));\n';
-        text += 'color: #eee;\n';
-        text += '}\n';
-
-        text += '.captureBtn span\n';
-        text += '{\n';
-        text += 'position:relative;';
-        text += 'top: 50%;\n';
-        text += 'transform:translateY(-50%);\n';
-        text += 'display:inline-block;';
-        text += 'padding: 5px;\n';
-        text += 'font-size: 14px;\n';
-        text += '}\n';
-
-        var node = document.createTextNode(text);
-        var style = document.createElement('style');
+        var style = document.createElement('link');
         style.setAttribute("class","sony_book_download");
-        style.appendChild(node);
+        style.setAttribute("rel","stylesheet");
+        style.setAttribute("type","text/css");
+        style.setAttribute("href",script_root_uri + "/book_marklet_style.css");
         parent.appendChild(style);
     }
     /* <body>~</body>. */
@@ -381,11 +199,27 @@ SonyのReaderStoreのブラウザ閲覧ページから画像を保存するbookm
         var pnum_node = document.querySelector(".Menubar_top .title");
         return getElementText(pnum_node);
     }
+    /* ページめくり順方向取得(0:左から右, 1:右から左). */
+    function getPageMoveDirection() {
+        var dir = 0;
+        var nextBtn = document.querySelector("button.next");
+        if (hasAttrValue(nextBtn, "class", "Left")) {
+            dir = 1;
+        }
+        return dir;
+    }
     /* 表示中のページ画像を保存. */
     function captureImgs() {
         var urls = getPageUrl();
-        for (var i=urls.length-1; i>=0; i--) {
-            saveFile(urls[i], getZeroFillString(getPageIndex()+urls.length-2-i, getDecimalNumberLength(getPageLength())) + ".png");
+        if(getPageMoveDirection() == 0) {
+            // ←方向ページめくり.
+            for (var i=0; i<urls.length; i++) {
+                saveFile(urls[i], getZeroFillString(getPageIndex()+i-1, getDecimalNumberLength(getPageLength())) + ".png");
+            }
+        } else {
+            for (var i=urls.length-1; i>=0; i--) {
+                saveFile(urls[i], getZeroFillString(getPageIndex()+urls.length-2-i, getDecimalNumberLength(getPageLength())) + ".png");
+            }
         }
     }
 
@@ -437,26 +271,6 @@ SonyのReaderStoreのブラウザ閲覧ページから画像を保存するbookm
         }
         saveFile(zip_blob_url, filename);
     }
-    /* スリープ付きループ処理.
-        aLoopLimit:ループ回数上限.
-        aInterval:スリープ時間[msec].
-        aMainFunc:ループ毎に実行する処理.
-    */
-    function loopSleep(aLoopLimit, aInterval, aMainFunc){
-        var i = 0;
-        var loopFunc = function () {
-            var result = aMainFunc(i);
-            if (result === false
-                || mCapturingState != 1) {
-                return;
-            }
-            i = i + 1;
-            if (i < aLoopLimit) {
-                setTimeout(loopFunc, aInterval);
-            }
-        }
-        loopFunc();
-    }
     /* 自動ページ画像保存開始. */
     function startAutoCaptureSequence() {
         // 状態遷移.
@@ -467,8 +281,16 @@ SonyのReaderStoreのブラウザ閲覧ページから画像を保存するbookm
             try {
                 // ページ画像をZIPに追加.
                 var urls = getPageUrl();
-                for (var i=urls.length-1; i>=0; i--) {
-                    zip.file(getZeroFillString(getPageIndex()+urls.length-2-i, getDecimalNumberLength(getPageLength())) + ".png", convertDataUrlToArrayBuffer(urls[i]));
+                if(getPageMoveDirection() == 0) {
+                    // ←方向ページめくり.
+                    for (var i=0; i<urls.length; i++) {
+                        zip.file(getZeroFillString(getPageIndex()+i-1, getDecimalNumberLength(getPageLength())) + ".png", convertDataUrlToArrayBuffer(urls[i]));
+                    }
+                } else {
+                    // →方向ページめくり.
+                    for (var i=urls.length-1; i>=0; i--) {
+                        zip.file(getZeroFillString(getPageIndex()+urls.length-2-i, getDecimalNumberLength(getPageLength())) + ".png", convertDataUrlToArrayBuffer(urls[i]));
+                    }
                 }
                 if (getPageIndex() + urls.length <= getPageLength()) {
                     // 次ページへ.

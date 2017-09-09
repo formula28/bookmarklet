@@ -1,0 +1,49 @@
+/* キャプチャボタン */
+#captureBtnArea {
+    position:absolute;
+    bottom:100px;
+}
+
+[class*="captureBtn"] {
+    width:120px;
+    height:40px;
+    margin:3px;
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+}
+
+[class*="captureBtn"][class*="normal"] {
+    border: solid #CCC;
+    border-width:1px 3px 3px 1px;
+    border-radius: 8px;
+    -ms-border-radius: 8px;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    background: -ms-linear-gradient(top,#FFF 0%,#FFF 3%,#E6E6E6 3%,#FFF);
+    background: -moz-linear-gradient(top,#FFF 0%,#FFF 3%,#E6E6E6 3%,#FFF);
+    background: -webkit-gradient(linear, left top, left bottom, from(#FFF), color-stop(0.03,#FFF), color-stop(0.03,#E6E6E6), to(#FFF));
+    color: #111;
+}
+
+[class*="captureBtn"][class*="over"] {
+    border: solid #0099CC;
+    border-width:1px 3px 3px 1px;
+    border-radius: 8px;
+    -ms-border-radius: 8px;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    background: -ms-linear-gradient(top,#B1D2E0 0%,#B1D2E0 3%,#0099CC 3%,#069);
+    background: -moz-linear-gradient(top,#B1D2E0 0%,#B1D2E0 3%,#0099CC 3%,#069);
+    background: -webkit-gradient(linear, left top, left bottom, from(#B1D2E0), color-stop(0.03,#B1D2E0), color-stop(0.03,#0099CC), to(#069));
+    color: #eee;
+}
+
+.captureBtn span {
+    position:relative;
+    top: 50%;
+    transform:translateY(-50%);
+    display:inline-block;
+    padding: 5px;
+    font-size: 14px;
+}
