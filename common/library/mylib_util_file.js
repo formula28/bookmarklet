@@ -8,7 +8,6 @@
      * @param {string} aFilename 保存時のファイル名.
      */
     function saveFile(aUrl, aFilename) {
-        console.log("url = " + aUrl);
         console.log("filename = " + aFilename);
         if (aUrl != null) {
             var a = document.createElement("a");
