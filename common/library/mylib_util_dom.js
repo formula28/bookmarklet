@@ -65,13 +65,27 @@
     /**
      * DOM要素内テキスト取得.
      * @description elemをStringに変換.
-     * @param {Node} elem DOM要素.
+     * @param {Any} elem DOM要素/要素リスト/配列など.
      * @return {string} DOM要素文字列(elemがnullの場合"null"を返す).
      */
     function getElementText(elem) {
         var ret = 'null';
         if(elem != null){
             ret = elem.textContent;
+        }
+        if (elem instanceof NodeList || elem instanceof Array) {
+            ret = '[';
+            if (elem.length > 0) {
+                ret += getElementText(elem[0]);
+                for(var i=1;i < elem.length;i++){
+                    ret += ', ' + getElementText(elem[i]);
+                }
+            }
+            ret += ']';
+        } else if (elem instanceof Element) {
+            ret = elem.textContent;
+        } else if (elem != null) {
+            ret = elem.toString();
         }
         return ret;
     }

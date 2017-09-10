@@ -3,6 +3,61 @@
  */
 
     /**
+     * フォーマット関数
+     */
+    /* 存在チェック */
+    if (String.prototype.format == undefined) {
+        String.prototype.format = function(arg)
+        {
+            // 置換関数.
+            var rep_fn = undefined;
+            if (typeof arg == "object") {
+                // オブジェクトの場合
+                // ※(例) var str = "{0} : {1} + {2} = {3}".format("足し算", 8, 0.5, 8+0.5);
+                rep_fn = function(m, k) { return arg[k]; }
+            } else {
+                // 複数引数だった場合
+                // ※(例) var str = "名前 : {name}, 年齢 : {age}".format( { "name":"山田", "age":128 } );
+                var args = arguments;
+                rep_fn = function(m, k) { return args[ parseInt(k) ]; }
+            }
+            return this.replace( /\{(\w+)\}/g, rep_fn );
+        }
+    }
+
+    /**
+     * 文字列判定.
+     * @param {any} obj 
+     */
+    /* 存在チェック */
+    if (Object.prototype.isString == undefined) {
+        Object.prototype.isString = function(obj)
+        {
+            return (typeof (obj) === "string" || obj instanceof String);
+        }
+    }
+
+    /**
+     * 空チェック関数.
+     */
+    /* 存在チェック */
+    if (Object.prototype.isEmpty == undefined) {
+        Object.prototype.isEmpty = function(obj) {
+            var ret = true;
+            if (obj == null) {
+                ret = true;
+            } else if (Array.isArray(obj) || Object.isString(obj) || _.isArguments(obj)) {
+                // 引数が arguments か 配列 か 文字列 の時は length === 0 の真偽値を返す.
+                ret = (obj.length === 0);
+            } else {
+                // 引数がObjectなら key値の配列を作成して長さの真偽値を返す。 
+                ret = (obj.keys().length === 0);
+            }
+            return ret;
+        }
+    }
+
+    /**
      * ファイル名禁止文字置換.
      * @description Windowsファイル名禁止の半角文字を全角文字に置換する.
      * @param{string} str 文字列.

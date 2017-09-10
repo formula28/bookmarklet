@@ -1,0 +1,138 @@
+body {
+    position:relative;
+}
+
+/* レイヤー表示全体. */
+#pixiv_image_info_layer {
+    position:absolute;
+    top:0;
+    left:0;
+    z-index:10000;
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100%;
+    background-color:rgba(0,0,0,0.45);
+}
+#pixiv_image_info_layer * {
+    font-size:10pt;
+}
+#wholebox {
+    position:relative;
+    padding:20px;
+}
+
+/* メタデータテーブル. */
+#pixiv_image_info_layer table#metadata {
+    margin:0px;
+    border:2px solid #555555;
+    border-spacing:0px;
+}
+#pixiv_image_info_layer table#metadata tr {
+    margin:0px;
+    border:2px solid #555555;
+}
+#pixiv_image_info_layer table#metadata th {
+    margin:0px;
+    padding:5px;
+    border:2px solid #555555;
+    min-width:100px;
+    background-color:rgba(206,245,204,0.80);
+}
+#pixiv_image_info_layer table#metadata td {
+    margin:0px;
+    padding:5px;
+    border:2px solid #555555;
+    min-width:100px;
+    background-color:rgba(255,255,255,0.80);
+}
+
+/* ダウンロードボタン start. */
+#pixiv_image_info_layer #btn_area
+{
+    margin-top: 10px;
+}
+#pixiv_image_info_layer #all_download_button
+, #pixiv_image_info_layer #ugoillzip_download_button
+, #pixiv_image_info_layer #ugoillhqzip_download_button
+{
+    display: inline-block;
+    margin: 0px 5px 0px 0px;
+    padding: 0px;
+    width: 140px;
+    height: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    text-align: center;
+}
+#pixiv_image_info_layer #all_download_button span
+, #pixiv_image_info_layer #ugoillzip_download_button span
+, #pixiv_image_info_layer #ugoillhqzip_download_button span
+{
+    display:inline-block;
+    padding: 5px;
+    font-size: 14px;
+    vertical-align: middle;
+}
+#all_download_button[class*="normal"]
+, #ugoillzip_download_button[class*="normal"]
+, #ugoillhqzip_download_button[class*="normal"]
+{
+    border: solid #CCC;
+    border-width:1px 3px 3px 1px;
+    border-radius: 8px;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    background: -ms-linear-gradient(top,#FFF 0%,#FFF 3%,#E6E6E6 3%,#FFF);
+    background: -moz-linear-gradient(top,#FFF 0%,#FFF 3%,#E6E6E6 3%,#FFF);
+    background: -webkit-gradient(linear, left top, left bottom, from(#FFF), color-stop(0.03,#FFF), color-stop(0.03,#E6E6E6), to(#FFF));
+    color: #111;
+}
+#all_download_button[class*="over"] 
+, #ugoillzip_download_button[class*="over"]
+, #ugoillhqzip_download_button[class*="over"]
+{
+    border: solid #0099CC;
+    border-width:1px 3px 3px 1px;
+    border-radius: 8px;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    background: -ms-linear-gradient(top,#B1D2E0 0%,#B1D2E0 3%,#0099CC 3%,#069);
+    background: -moz-linear-gradient(top,#B1D2E0 0%,#B1D2E0 3%,#0099CC 3%,#069);
+    background: -webkit-gradient(linear, left top, left bottom, from(#B1D2E0), color-stop(0.03,#B1D2E0), color-stop(0.03,#0099CC), to(#069));
+    color: #eee;
+}
+/* ダウンロードボタン end. */
+
+/* サムネイル. */
+#pixiv_image_info_layer #image_display_box{
+    display:inline-block;
+    margin-top:15px;
+}
+#pixiv_image_info_layer .image_wrapper {
+    position:relative;
+    display:inline-block;
+    margin:2px;
+    border:1px solid #51b5e6;
+    line-height:0;
+}
+#pixiv_image_info_layer .dl_overlay {
+    position:absolute;
+    width:100%;
+    height:100%;
+    background-color:rgba(0,0,0,0.5);
+    text-align:center;
+    visibility:hidden;
+    color:#ffffff;
+}
+#pixiv_image_info_layer .dl_overlay:before {
+    content:"";
+    display:inline-block;
+    width:0px;
+    height:100%;
+    vertical-align:middle;
+}
+#pixiv_image_info_layer .indiv_dl_btn {
+    display:inline-block;
+    vertical-align:middle;
+}

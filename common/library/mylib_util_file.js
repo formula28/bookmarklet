@@ -23,6 +23,24 @@
     }
 
     /**
+     * <img>からBase64エンコード.
+     * @param {Element} imgElem 
+     * @param {string} mime_type 
+     */
+    function ImageToBase64(imgElem, mime_type) {
+        imgElem.crossOrigin = "Anonymous";
+        // New Canvas
+        var canvas = document.createElement('canvas');
+        canvas.width  = imgElem.width;
+        canvas.height = imgElem.height;
+        // Draw Image
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(imgElem, 0, 0);
+        // To Base64
+        // ※通常だと、toDataURLでエラーが起きる.セキュリティOFF起動したchromeで利用すること.
+        return canvas.toDataURL(mime_type);
+    }
+    /**
      * DataURLからBlobURL変換
      * @description (画像の)DataURLからBlobURLへ変換する.
      * @param {URL} dataUrl (画像の)DataURL.
