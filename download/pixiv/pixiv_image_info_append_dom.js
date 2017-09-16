@@ -282,7 +282,7 @@
                             onClick="downloadIndivImage(\'{0}\',\'{1}\')"\
                         >\
                             <img class="indiv_dl_btn"\
-                                src="data:image/png,%89PNG%0D%0A%1A%0A%00%00%00%0DIHDR%00%00%00%14%00%00%00%1B%08%06%00%00%00%7C%DF%AF%D8%00%00%00%04sBIT%08%08%08%08%7C%08d%88%00%00%00%09pHYs%00%00%0B%12%00%00%0B%12%01%D2%DD~%FC%00%00%00%16tEXtCreation%20Time%0010%2F09%2F09%D6%A3%10%D0%00%00%00%18tEXtSoftware%00Adobe%20FireworksO%B3%1FN%00%00%01qIDATH%89%E5%95%CDM%C30%18%86_G%28%3FU%0E%7C7%8E%D9%21%03%D0%11%60%03%BAAG%E8%28%D9%A0%DD%A00K%D5%D2%5Cl%A3V%80%1C%D5%1F%97%B8j%FE%0C%B4%1C%40%3CR%94%C8~%DF%27%96b9%82%99%E1C%29%D5%08%10%91%F0%E5%03%AF%ED%0C%FE%A1P%F4%7D%14%A5%D4%1C%C0%DD%27%DD%05%11%DD%B7%07%87V%F8%00%40%7Bd%BA%CEt%E8%15%12%D1%CBP%C1%BD%B0%CE%7CM%08%60LD%D30%0C%3B%13Q%14%81%88%A6%00%C6%BDMf%3E%BD%C6%CC%BC%E4%1Ak-k%ADYJ%C9RJ%D6Z%B3%B5%96OX%D6%9D%A3%C3%3Dd%CC%3C%E7%1E%AA%AA%3A%0A%AB%AA%EA%8Bp%DD%CD%9C%B0%18J%9DA%21v%BB%DD%F3h4%BA%09%82%CB%B6%A41%06%AB%D5j%2B%A4%94%0C%00a%18%EE%93%24I%BF%2B6%C6%60%BD%5E%EF%A5%94%29%00%1C%85%8E%AF%8A%DB\"%C7UO05%C6%BC%C6ql%E28%BE%16%A2yZ%1D%0E%07l%B7%5B%5D%96e%C8%CCi%BB%DFYacR%88%B7%28%8AD%92%241%00l6%9B%F7%B2%2C%D9Z%9B%0Cv%7CB%87R%AAq%F7%F1%FB%8F%AF%BF%21%2C~%D0W%04D4%01%90%01X%5C%20Z%00%C8%F2%3C%9F4~%01J%A9%5B%003%B4%CE%3A%CF%B6y%040%CB%F3%FC%C9%0D%0C%FDS%1A%E2%1EaG%E4%15%B6%C5J%29%27%1E%149%3E%00%04%BB%7Dq%08F%E0%CE%00%00%00%00IEND%AEB%60%82"\
+                                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAbCAYAAAB836/YAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAABZ0RVh0Q3JlYXRpb24gVGltZQAxMC8wOS8wOdajENAAAAAYdEVYdFNvZnR3YXJlAEFkb2JlIEZpcmV3b3Jrc0+zH04AAAFxSURBVEiJ5ZXNTcMwGIZfRyg/VQ58N47ZIQPQEWADukFH6CjZoN2gMEvV0lxso1aAHNUfl7hq/gy0HEA8UpTIft8nlmI5gpnhQynVCBCR8OUDr+0M/qFQ9H0UpdQcwN0n3QUR3bcHh1b4AEB7ZLrOdOgVEtHLUMG9sM58TQhgTETTMAw7E1EUgYimAMa9TWY+vcbMvOQaay1rrVlKyVJK1lqztZZPWNado8M9ZMw85x6qqjoKq6rqi3DdzZywGEqdQSF2u93zaDS6CYLLtqQxBqvVaiuklAwAYRjukyRJvys2xmC9Xu+llCkAHIWOr4rbIsdVTzA1xrzGcWziOL4WonlaHQ4HbLdbXZZlyMxpu99ZYWNSiLcoikSSJDEAbDab97Is2VqbDHZ8QodSqnH38fuPr78hLH7QVwRENAGQAVhcIFoAyPI8nzR+AUqpWwAztM46z7Z5BDDL8/zJDQz9UxriHmFH5BW2xUopJx4UOT4ABLt9cQhG4M4AAAAASUVORK5CYII="\
                                 />\
                             <span class="dl_overlay_text">No.{2}</span>\
                         </div>\
@@ -304,52 +304,6 @@
             }
         }
         parent.insertAdjacentHTML("beforeend",html);
-
-        /*
-        var imageDisplayBox = document.createElement("div");
-        imageDisplayBox.setAttribute("id","image_display_box");
-        parent.appendChild(imageDisplayBox);
-        var noImageTextNode = document.createTextNode("no image.");
-        if (common_image_url == null) {
-            imageDisplayBox.appendChild(noImageTextNode);
-        } else {
-            if (isParsedImageUrlDecision()) {
-                for (var i=0;i<page_count;i++) {
-                    var dlImageUrl = getDownloadImageUrl(i);
-                    var dlFilename = getDownloadFilename(dlImageUrl);
-                    var imageWrapper = document.createElement("div");
-                    imageWrapper.setAttribute("class","image_wrapper");
-                    imageWrapper.setAttribute("onMouseOver","setVisibilityDlOverlay(this,true)");
-                    imageWrapper.setAttribute("onMouseOut","setVisibilityDlOverlay(this,false)");
-                    imageDisplayBox.appendChild(imageWrapper);
-
-                    var dlOverlay = document.createElement("div");
-                    dlOverlay.setAttribute("class","dl_overlay");
-                    dlOverlay.setAttribute("onClick","downloadIndivImage('" + dlImageUrl + "','" + dlFilename + "')");
-                    imageWrapper.appendChild(dlOverlay);
-
-                    var indivDlBtn = document.createElement("img");
-                    indivDlBtn.setAttribute("class","indiv_dl_btn");
-                    indivDlBtn.setAttribute("src","data:image/png,%89PNG%0D%0A%1A%0A%00%00%00%0DIHDR%00%00%00%14%00%00%00%1B%08%06%00%00%00%7C%DF%AF%D8%00%00%00%04sBIT%08%08%08%08%7C%08d%88%00%00%00%09pHYs%00%00%0B%12%00%00%0B%12%01%D2%DD~%FC%00%00%00%16tEXtCreation%20Time%0010%2F09%2F09%D6%A3%10%D0%00%00%00%18tEXtSoftware%00Adobe%20FireworksO%B3%1FN%00%00%01qIDATH%89%E5%95%CDM%C30%18%86_G%28%3FU%0E%7C7%8E%D9%21%03%D0%11%60%03%BAAG%E8%28%D9%A0%DD%A00K%D5%D2%5Cl%A3V%80%1C%D5%1F%97%B8j%FE%0C%B4%1C%40%3CR%94%C8~%DF%27%96b9%82%99%E1C%29%D5%08%10%91%F0%E5%03%AF%ED%0C%FE%A1P%F4%7D%14%A5%D4%1C%C0%DD%27%DD%05%11%DD%B7%07%87V%F8%00%40%7Bd%BA%CEt%E8%15%12%D1%CBP%C1%BD%B0%CE%7CM%08%60LD%D30%0C%3B%13Q%14%81%88%A6%00%C6%BDMf%3E%BD%C6%CC%BC%E4%1Ak-k%ADYJ%C9RJ%D6Z%B3%B5%96OX%D6%9D%A3%C3%3Dd%CC%3C%E7%1E%AA%AA%3A%0A%AB%AA%EA%8Bp%DD%CD%9C%B0%18J%9DA%21v%BB%DD%F3h4%BA%09%82%CB%B6%A41%06%AB%D5j%2B%A4%94%0C%00a%18%EE%93%24I%BF%2B6%C6%60%BD%5E%EF%A5%94%29%00%1C%85%8E%AF%8A%DB\"%C7UO05%C6%BC%C6ql%E28%BE%16%A2yZ%1D%0E%07l%B7%5B%5D%96e%C8%CCi%BB%DFYacR%88%B7%28%8AD%92%241%00l6%9B%F7%B2%2C%D9Z%9B%0Cv%7CB%87R%AAq%F7%F1%FB%8F%AF%BF%21%2C~%D0W%04D4%01%90%01X%5C%20Z%00%C8%F2%3C%9F4~%01J%A9%5B%003%B4%CE%3A%CF%B6y%040%CB%F3%FC%C9%0D%0C%FDS%1A%E2%1EaG%E4%15%B6%C5J%29%27%1E%149%3E%00%04%BB%7Dq%08F%E0%CE%00%00%00%00IEND%AEB%60%82");
-                    dlOverlay.appendChild(indivDlBtn);
-
-                    var dlOverlayText = document.createElement("span");
-                    dlOverlayText.setAttribute("class","dl_overlay_text");
-                    var dlOverlayTextNode = document.createTextNode("No." + (i+1));
-                    dlOverlayText.appendChild(dlOverlayTextNode);
-                    dlOverlay.appendChild(dlOverlayText);
-
-                    var image = document.createElement("img");
-                    image.setAttribute("alt","No." + (i+1));
-                    image.setAttribute("src",getThumbnailImageUrl(i));
-                    image.setAttribute("title","No." + (i+1));
-                    imageWrapper.appendChild(image);
-                }
-            } else {
-                imageDisplayBox.appendChild(noImageTextNode);
-            }
-        }
-        */
     }
     /* サムネイル画像オーバーレイ表示/非表示切り替え. */
     function setVisibilityDlOverlay(element, visibility) {
