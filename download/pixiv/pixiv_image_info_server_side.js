@@ -10,23 +10,31 @@ pixivのイラスト個別ページ閲覧中に実行すると、そのイラス
     var script_root_uri = root_uri + "/bookmarklet/download/pixiv";
 
     /* ライブラリのinclude. */
+    var jss = document.querySelectorAll("script.pixiv_image_info_subscr");
+    if (jss != null && jss.length > 0) {
+        jss.forEach(function(value){
+            document.body.removeChild(value);
+        })
+    }
     ["jszip.min.js"
     , "mylib_util_dom.js"
     , "mylib_util_str.js"
     , "mylib_util_file.js"
     , "mylib_util_logic.js"
     ].forEach(function(value) {
-        var script = document.createElement("script");
-        script.src = root_uri + "/bookmarklet/common/library/" + value;
-        document.body.appendChild(script);
+        var s = document.createElement("script");
+        s.setAttribute("class","pixiv_image_info_subscr");
+        s.setAttribute("src", root_uri + "/bookmarklet/common/library/" + value);
+        document.body.appendChild(s);
     });
     /* 分割スクリプトのinclude. */
-    ["pixiv_imge_info_image_meta_data.js"   // pixiv 画像メタデータ取得.
+    ["pixiv_image_info_image_meta_data.js"   // pixiv 画像メタデータ取得.
     , "pixiv_image_info_append_dom.js"      // DOM追加処理.
     ].forEach(function(value) {
-        var script = document.createElement("script");
-        script.src = script_root_uri + "/" + value;
-        document.body.appendChild(script);
+        var s = document.createElement("script");
+        s.setAttribute("class","pixiv_image_info_subscr");
+        s.setAttribute("src", script_root_uri + "/" + value);
+        document.body.appendChild(s);
     });
 
     /* プロキシURL取得. */
@@ -140,7 +148,4 @@ pixivのイラスト個別ページ閲覧中に実行すると、そのイラス
         }
     }
     /* まとめて画像ダウンロード end. */
-
-    /* ページ書き出し実行(外部スクリプトのロード完了後に実行するようスリープ). */
-    setTimeout(function(){appendHtml();}, 1000);
 //})();
