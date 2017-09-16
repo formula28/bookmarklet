@@ -2,6 +2,53 @@
 ニコニコ静画のイラスト個別ページ閲覧中に実行すると、そのイラストをダウンロードするbookmarkletです。
 */
 //(function(){
+    /** ルートURI. */
+    var root_uri = "//formula25.sakura.ne.jp";
+    /** 共通ライブラリのルートURI. */
+    var root_com_lib_uri = root_uri + "/bookmarklet/common/library";
+    /** このスクリプトのルートURI. */
+    var script_root_uri = root_uri + "/bookmarklet/download/nicoseiga";
+    /** コンテンツダウンロード用プログラム. */
+    var dl_proxy_uri = script_root_uri + "/dlimage.php";
+    
+    /* 外部スクリプトの削除. */
+    var jss = document.querySelectorAll("script.nicoseiga_image_downloader_subscr");
+    if (jss != null && jss.length > 0) {
+        jss.forEach(function(value){
+            document.body.removeChild(value);
+        })
+    }
+    /* 外部スクリプト追加 start. */
+    var scripts = [
+        root_com_lib_uri + "/mylib_util_dom.js"
+        , root_com_lib_uri + "/mylib_util_str.js"
+        , root_com_lib_uri + "/mylib_util_file.js"
+        , script_root_uri + "/nicoseiga_image_downloader_meta_data.js"
+        , script_root_uri + "/nicoseiga_image_downloader_download_start.js"
+    ];
+    /** スクリプトを順次読み込み.
+        @description 普通にscriptタグ埋め込むと、並列で読み込むが、
+        依存関係のあるスクリプトがあるので前のスクリプトが読み込み終わってから、
+        次のスクリプトを読み込む.
+     */
+    var loadScripts = function() {
+        var i = 0;
+        var loopMain = function(uri) {
+            var s = document.createElement("script");
+            s.setAttribute("class","nicoseiga_image_downloader_subscr");
+            s.setAttribute("src", uri);
+            s.onload = function() {
+                i=i+1;
+                if (i<scripts.length) {
+                    loopMain(scripts[i]);
+                }
+            };
+            document.body.appendChild(s);
+        };
+        loopMain(scripts[i]);
+    };
+    loadScripts();
+    /* 外部スクリプト追加 end. */
 
     /* 開いているページのdocument. */
     var doc = document;
@@ -10,125 +57,4 @@
         doc = originpage.document;
     }
 
-    /* 画像メタデータ start. */
-    /* ページのタイトル(String). */
-    var page_title = getElementText(doc.querySelector("title"));
-    /* ユーザー名(String). */
-    var user_name = getElementText(doc.querySelector("li.user_name strong"));
-    if (user_name == "null") {
-        user_name = getElementText(doc.querySelector("div.illust_user_name strong"));
-    }
-    /* 画像タイトル(String). */
-    var image_title = getElementText(doc.querySelector("h1.title"));
-    if (image_title == "null") {
-        image_title = getElementText(doc.querySelector("li.active span[itemprop='title']"));
-    }
-    /* 画像のタグ配列(String Array). */
-    var tags = Video.tags;
-    printMetaData();
-
-    function printMetaData() {
-        console.log(page_title);
-        console.log(user_name);
-        console.log(image_title);
-        console.log(tags);
-    }
-    /* 画像メタデータ end. */
-
-    /* ユーティリティメソッド start. */
-    /* html elementをStringに変換. */
-    function getElementText(element) {
-        var ret = 'null';
-        if(element != null){
-            ret = element.textContent;
-        }
-        return ret;
-    }
-    /* 属性値設定処理. */
-    function changeAttr(elem,attr,attrValue) {
-        if (elem != null && attr != null) {
-            elem.setAttribute(attr,attrValue);
-        }
-    }
-
-    /* URLからファイル名部分(拡張子付き)取得. */
-    function getFilenameInUrl(url) {
-        return url.match(".+/(.+?)([\?#;].*)?$")[1];
-    }
-    /* URLからファイル名部分(拡張子なし)取得. */
-    function getFilenameWithoutExeInUrl(url) {
-        return url.match(".+/(.+?)\.[a-z]+([\?#;].*)?$")[1];
-    }
-    /* URLから拡張子部分取得. */
-    function getExeInUrl(url) {
-        return url.match(".+/.+?\.([a-z]+)([\?#;].*)?$")[1];
-    }
-    function getIllustId() {
-        return window.location.href.match(".+/im(.+?)([\?#;].*)?$")[1]
-    }
-    /* ユーティリティメソッド end. */
-
-    /* イラストIDからダウンロード用ファイル名生成. */
-    function getDownloadFilename(illust_id) {
-        var ret = "["
-            + user_name
-            + "]"
-            + image_title
-            + "_"
-            + illust_id;
-        if (tags != null && tags.length > 0) {
-            var tagtext = "[" + tags[0];
-            for(var i=1;i < tags.length;i++){
-                tagtext += ' ' + tags[i];
-            }
-            tagtext += "]";
-            ret += tagtext;
-        }
-        //ret += "." + org_exe;
-        // ファイル名禁止文字を置換
-        ret = ret.replace(/&/g, '＆');
-        ret = ret.replace(/:/g, '：');
-        ret = ret.replace(/\//g, '／');
-        ret = ret.replace(/\\/g, '￥');
-        ret = ret.replace(/\|/g, '｜');
-        ret = ret.replace(/\*/g, '＊');
-        ret = ret.replace(/\?/g, '？');
-        ret = ret.replace(/"/g, '”');
-        ret = ret.replace(/</g, '＜');
-        ret = ret.replace(/>/g, '＞');
-        console.log(ret);
-        return ret;
-    }
-
-    /* 画像ダウンロード. */
-    function downloadImage() {
-        php_base_url = "//formula25.sakura.ne.jp/bookmarklet/download/nicoseiga/dlimage.php";
-        illust_id = getIllustId();
-        console.log(illust_id);
-        if (illust_id != null) {
-            filename = getDownloadFilename(illust_id);
-            console.log(filename);
-            if (filename != null) {
-                saveFile(php_base_url + "?id=" + illust_id + "&dlname=" + filename, filename);
-            }
-        }
-    }
-    /* ファイル保存. */
-    function saveFile(aUrl, aFilename) {
-        console.log(aUrl, aFilename);
-        if (aUrl != null) {
-            var a = doc.createElement("a");
-            a.href = aUrl;
-            if (aFilename != null) {
-                a.download = aFilename;
-            }
-            a.target = "_blank";
-            doc.body.appendChild(a);
-            a.click();
-            doc.body.removeChild(a);
-        }
-    }
-
-    printMetaData();
-    downloadImage();
 //})();
