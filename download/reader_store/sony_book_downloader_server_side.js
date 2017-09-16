@@ -281,28 +281,35 @@ SonyのReaderStoreのブラウザ閲覧ページから画像を保存するbookm
         changeCapturingState(1);
         var page_num_digis = getDecimalNumberLength(getPageLength());
         var page_direc = getPageMoveDirection();
-        loopSleep(getPageLength(), 700, function() {
-            var isSuccess = true;
-            try {
-                // ページ画像をZIPに追加.
-                var urls = getPageUrl();
-                for (var i=0; i<urls.length; i++) {
-                    zip.file(getZeroFillString(getPageIndex()+i-1, page_num_digis) + ".png"
-                            , convertDataUrlToArrayBuffer(urls[(page_direc==0?i:urls.length-1-i)]));
+        loopSleep(
+            getPageLength()
+            , 700
+            , function() {
+                var isSuccess = true;
+                try {
+                    // ページ画像をZIPに追加.
+                    var urls = getPageUrl();
+                    for (var i=0; i<urls.length; i++) {
+                        zip.file(getZeroFillString(getPageIndex()+i-1, page_num_digis) + ".png"
+                                , convertDataUrlToArrayBuffer(urls[(page_direc==0?i:urls.length-1-i)]));
+                    }
+                    if (getPageIndex() + urls.length <= getPageLength()) {
+                        // 次ページへ.
+                        isSuccess = moveNextPage();
+                    } else {
+                        // 最後のページまで保存完了.
+                        changeCapturingState(3);
+                    }
+                } catch (e) {
+                    isSuccess = false;
+                    console.log(e);
                 }
-                if (getPageIndex() + urls.length <= getPageLength()) {
-                    // 次ページへ.
-                    isSuccess = moveNextPage();
-                } else {
-                    // 最後のページまで保存完了.
-                    changeCapturingState(3);
-                }
-            } catch (e) {
-                isSuccess = false;
-                console.log(e);
+                return isSuccess;
             }
-            return isSuccess;
-        });
+            , function() {
+                return mCapturingState != 1;
+            }
+        );
     }
     /**
      * 次のページに遷移.
