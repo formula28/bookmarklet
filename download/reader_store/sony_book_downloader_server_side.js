@@ -15,15 +15,22 @@ SonyのReaderStoreのブラウザ閲覧ページから画像を保存するbookm
     var script_root_uri = root_uri + "/bookmarklet/download/reader_store";
 
     /* ライブラリのinclude. */
+    var jss = document.querySelectorAll("script.sony_book_download_subscr");
+    if (jss != null && jss.length > 0) {
+        jss.forEach(function(value){
+            document.body.removeChild(value);
+        })
+    }
     ["jszip.min.sbd.js"
     , "mylib_util_dom.js"
     , "mylib_util_str.js"
     , "mylib_util_file.js"
     , "mylib_util_logic.js"
     ].forEach(function(value) {
-        var script = document.createElement("script");
-        script.src = root_uri + "/bookmarklet/common/library/" + value;
-        document.body.appendChild(script);
+        var s = document.createElement("script");
+        s.setAttribute("class","sony_book_download_subscr");
+        s.setAttribute("src", root_uri + "/bookmarklet/common/library/" + value);
+        document.body.appendChild(s);
     });
 
     /* DOM追加処理 start. */
@@ -316,5 +323,6 @@ SonyのReaderStoreのブラウザ閲覧ページから画像を保存するbookm
     }
     /* 自動ページ画像保存 end. */
 
+    /* ページ書き出し実行. */
     appendHtml();
 //})();
