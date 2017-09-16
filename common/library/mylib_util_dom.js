@@ -70,9 +70,6 @@
      */
     function getElementText(elem) {
         var ret = 'null';
-        if(elem != null){
-            ret = elem.textContent;
-        }
         if (elem instanceof NodeList || elem instanceof Array) {
             ret = '[';
             if (elem.length > 0) {

@@ -51,7 +51,7 @@
                 ret = (obj.length === 0);
             } else {
                 // 引数がObjectなら key値の配列を作成して長さの真偽値を返す。 
-                ret = (obj.keys().length === 0);
+                ret = (Object.keys(obj).length === 0);
             }
             return ret;
         }
