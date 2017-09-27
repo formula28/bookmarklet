@@ -25,11 +25,11 @@ $image_source_dom = new DOMDocument();
 $image_source_xpath = new DOMXPath($image_source_dom);
 
 // 画像ソースページから画像のURLをパース.
-$node = $image_source_xpath->query('//div[@id="content"]/div[@class="illust_view_big"]/img[@src]')->item(0);
+$node = $image_source_xpath->query('//div[@id="content"]/div[@class="illust_view_big"]')->item(0);
 if ($node == null) {
     return;
 }
-$image_url = $image_source_xpath->query('.//@src', $node)->item(0)->nodeValue;
+$image_url = $image_source_xpath->query('.//@data-src', $node)->item(0)->nodeValue;
 
 // 画像出力.
 echo(get_urldlcontents('http://lohas.nicoseiga.jp'.$image_url, $download_file_name));
