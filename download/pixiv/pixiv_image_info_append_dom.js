@@ -93,14 +93,13 @@
             <tr><th>ユーザー名</th><td>{2}</td></tr>\
             <tr><th>ユーザーID</th><td>{3}</td></tr>\
             <tr><th>投稿日時</th><td>{4}</td></tr>\
-            <tr><th>画像数</th><td>{5}</td></tr>\
+            <tr><th>画像枚数</th><td>{5}</td></tr>\
             <tr><th><span>画像サイズ<br>(w x h [px])</span></th><td>{6}</td></tr>\
-            <tr><th>制作ツール</th><td>{7}</td></tr>\
-            <tr><th>キャプション</th><td>{8}</td></tr>\
-            <tr><th>タグ</th><td>{9}</td></tr>\
-            <tr><th>閲覧数</th><td>{10}</td></tr>\
-            <tr><th>評価回数</th><td>{11}</td></tr>\
-            <tr><th>総合点</th><td>{12}</td></tr>\
+            <tr><th>キャプション</th><td>{7}</td></tr>\
+            <tr><th>タグ</th><td>{8}</td></tr>\
+            <tr><th>閲覧数</th><td>{9}</td></tr>\
+            <tr><th>お気に入り数</th><td>{10}</td></tr>\
+            <tr><th>ブックマーク数</th><td>{11}</td></tr>\
         </table>';
         parent.insertAdjacentHTML("beforeend", html.format(
             getElementText(image_title)
@@ -110,12 +109,11 @@
             , getElementText(image_upload_datetime)
             , getElementText(page_count)
             , getElementText(image_size)
-            , getElementText(draw_tools)
             , getElementText(caption)
             , getElementText(tags)
             , getElementText(view_count)
-            , getElementText(rated_count)
-            , getElementText(score_count)
+            , getElementText(like_count)
+            , getElementText(bookmark_count)
             ));
     }
 

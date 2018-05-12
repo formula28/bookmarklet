@@ -1,4 +1,28 @@
 /* pixiv 画像メタデータ start. */
+
+    /** 画像ID.
+     * @type {string}
+     */
+    var image_id = null;
+    function getImageId() {
+        var ret,kv;
+        var pair=location.search.substring(1).split('&');
+        // URLのqueryパラメータから最初の1文字(?記号)を除いた文字列を取得し、&で区切り配列に分割する
+        for(var i=0;pair[i];i++) {
+            // 変数kvにpairを=で区切り配列に分割する
+            kv = pair[i].split('=');
+            if (kv[0] == "illust_id") {
+                ret = kv[1];
+                break;
+            }
+        }
+        return ret;
+    }
+    image_id = getImageId();
+
+    /** 画像メタデータ. */
+    var image_meta = globalInitData.preload.illust[image_id];
+
     /** ページのタイトル.
      * @type {string}
      */
@@ -6,84 +30,60 @@
     /** ユーザーID.
      * @type {string}
      */
-    var user_id = pixiv.context.userId;
+    var user_id = image_meta.userId;
     /** ユーザー名.
      * @type {string}
      */
-    var user_name = pixiv.context.userName;
-    if (user_name == null) {
-        user_name = getElementText(document.querySelector(".profile-unit .user"));
-    }
-    /** 画像ID.
-     * @type {string}
-     */
-    var image_id = pixiv.context.illustId;
+    var user_name = globalInitData.preload.user[user_id].name;
     /** 画像タイトル.
      * @type {string}
      */
-    var image_title = pixiv.context.illustTitle;
-    if (image_title == null) {
-        image_title = getElementText(document.querySelector("section.work-info .title"));
-    }
+    var image_title = image_meta.illustTitle;
+    /** 画像枚数.
+     * @type {number}
+     */
+    var page_count = image_meta.pageCount;
     /** 画像サイズ(w x h).
      * @type {string}
      */
     var image_size = null;
-    image_size = getElementText(document.querySelectorAll("section.work-info .meta li")[1]);
-    /** 画像枚数.
-     * @type {number}
-     */
-    var page_count = 1;
-    if (image_size != null
-        && /複数枚投稿\s*([0-9]+)/.test(image_size)) {
-        page_count = RegExp.$1;
-    }
     /** 画像サイズ.
      * @type {number}
      */
-    var image_size_w = pixiv.context.illustSize[0];
-    var image_size_h = pixiv.context.illustSize[1];
+    var image_size_w = image_meta.width;
+    var image_size_h = image_meta.height;
     if (image_size_w != null && image_size_h != null) {
         image_size = image_size_w + " x " + image_size_h;
     }
-    /** 作成ツール.
-     * @type {string}
-     */
-    var draw_tools = getElementText(document.querySelector("section.work-info .meta .tools"));
     /** 画像のキャプション.
      * @type {string}
      */
-    var caption = getElementText(document.querySelector("section.work-info .caption"));
+    var caption = image_meta.illustComment;
     /** 画像のタグ配列.
      * @type {string[]}
      */
     var tags = new Array();
-    var tagsNodeList = document.querySelectorAll("section.work-tags .tags-container .tags .tag a.text");
-    for(var i=0;i < tagsNodeList.length;i++){
-        tags.push(getElementText(tagsNodeList[i]));
-    }
+    image_meta.tags.tags.forEach(function(element) {
+        tags.push(element.tag);
+    }, this);
     /** 閲覧数.
-     * @type {string}
+     * @type {number}
      */
-    var view_count = getElementText(document.querySelector("section.work-info section.score .view-count"));
-    /** 評価回数.
-     * @type {string}
+    var view_count = image_meta.viewCount;
+    /** お気に入り数.
+     * @type {number}
      */
-    var rated_count = getElementText(document.querySelector("section.work-info section.score .rated-count"));
-    /** 総合点.
-     * @type {string}
+    var like_count = image_meta.likeCount;
+    /** ブックマーク数.
+     * @type {number}
      */
-    var score_count = getElementText(document.querySelector("section.work-info section.score .score-count"));
+    var bookmark_count = image_meta.bookmarkCount;
 
     /** 共通画像URL.
      * @type {string}
      * @description (例) http://i4.pixiv.net/c/150x150/img-master/img/2015/07/02/21/03/35/51204151_p0_master1200.jpg */
     //var common_image_url = document.querySelector('meta[property="og:image"]').getAttribute("content");
-    var common_image_url = "";
-    var common_image = document.querySelector('.works_display ._layout-thumbnail img');
-    if (common_image != null && common_image.getAttribute("src") != null) {
-        common_image_url = common_image.getAttribute("src");
-    }
+    var common_image_url = image_meta.urls.thumb;
     console.log(common_image_url);
     /** 共通画像URLオリジン部分.
      * @type {string}
@@ -189,7 +189,7 @@
      */
     function getThumbnailImageUrl(page_num) {
         var ret = image_url_origin
-                + "/c/150x150/img-master/img"
+                + "/c/240x240/img-master/img"
                 + image_url_dir_datetime
                 + image_url_filename_illust_id
                 + image_url_filename_p
@@ -208,7 +208,7 @@
      */
     function getMediumSizeImageUrl(page_num) {
         return image_url_origin
-                + "/c/600x600/img-master/img"
+                + "/c/540x540_70/img-master/img"
                 + image_url_dir_datetime
                 + image_url_filename_illust_id
                 + image_url_filename_p
@@ -225,7 +225,7 @@
      */
     function getLargeSizeImageUrl(page_num) {
         return image_url_origin
-                + "/c/1200x1200/img-master/img"
+                + "/img-master/img"
                 + image_url_dir_datetime
                 + image_url_filename_illust_id
                 + image_url_filename_p
@@ -246,7 +246,7 @@
          * pixivページ等から一度画像を表示した後は正しく表示される。
          * 確実に表示する方法がわかるまでは暫定で1200x1200画像のURLを返すようにする。
          */
-        /*var ret = image_url_origin
+        var ret = image_url_origin
                 + "/img-original/img"
                 + image_url_dir_datetime
                 + image_url_filename_illust_id
@@ -254,8 +254,8 @@
                 + page_num
                 + "."
                 + image_url_filename_exe
-                ;*/
-        var ret = getLargeSizeImageUrl(page_num);
+                ;
+        // var ret = getLargeSizeImageUrl(page_num);
         console.log(ret);
         return ret;
     }
@@ -265,14 +265,14 @@
      * @type {string}
      */
     var ugoIllZipUrl;
-    if (pixiv.context.ugokuIllustData != null) {
-        ugoIllZipUrl = pixiv.context.ugokuIllustData.src;
-    }
+    // if (pixiv.context.ugokuIllustData != null) {
+    //     ugoIllZipUrl = pixiv.context.ugokuIllustData.src;
+    // }
     /** うごイラZip URL(High Quority).
      * @type {string}
      */
     var ugoIllHQZipUrl;
-    if (pixiv.context.ugokuIllustFullscreenData != null) {
-        ugoIllHQZipUrl = pixiv.context.ugokuIllustFullscreenData.src;
-    }
+    // if (pixiv.context.ugokuIllustFullscreenData != null) {
+    //     ugoIllHQZipUrl = pixiv.context.ugokuIllustFullscreenData.src;
+    // }
 /* pixiv 画像メタデータ end. */
