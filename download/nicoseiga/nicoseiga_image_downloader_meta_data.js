@@ -27,7 +27,10 @@
      * 画像のタグ配列.
      * @type {string[]}
      */
-    var tags = Video.tags;
+    var tags = Array.prototype.map.call(
+        doc.querySelectorAll("div.illust_tag.cfix.static li.tag")
+        , (item) => {return item.innerText}
+    );
 
     /**
      * イラストID.
