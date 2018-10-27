@@ -203,8 +203,8 @@ SonyのReaderStoreのブラウザ閲覧ページから画像を保存するbookm
      */
     function getPageMoveDirection() {
         var dir = 0;
-        var nextBtn = document.querySelector("button.next");
-        if (hasAttrValue(nextBtn, "class", "Left")) {
+        var elem = document.querySelector("div.TurningPageIndicator_position");
+        if (hasAttrValue(elem, "class", "Right")) {
             dir = 1;
         }
         return dir;
@@ -218,7 +218,7 @@ SonyのReaderStoreのブラウザ閲覧ページから画像を保存するbookm
         var page_direc = getPageMoveDirection();
         
         for (var i=0; i<urls.length; i++) {
-            saveFile(urls[(page_direc==0?i:urls.length-1-i)]
+            saveFile(convertDataUrlToBlobUrl(urls[(page_direc==0?i:urls.length-1-i)])
                     , getZeroFillString(getPageIndex()+i-1, page_num_digis) + ".png");
         }
     }
@@ -318,12 +318,12 @@ SonyのReaderStoreのブラウザ閲覧ページから画像を保存するbookm
      * @return {boolean}.
      */
     function moveNextPage() {
-        var nextBtn = document.querySelector("button.next");
+        var detectElem = document;
         var ret = false;
-        if (nextBtn != null) {
-            var event = document.createEvent( "MouseEvents" );
-            event.initEvent("mousedown", true, true);
-            nextBtn.dispatchEvent(event);
+        if (detectElem != null) {
+            var page_direc = getPageMoveDirection();
+            var event = new KeyboardEvent('keydown', {'key':(page_direc ? 'ArrowLeft' : 'ArrowRight'), 'bubbles':true, 'cancelable':true});
+            detectElem.dispatchEvent(event);
             ret = true;
         }
         return ret;
